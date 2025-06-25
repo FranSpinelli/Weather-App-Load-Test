@@ -6,14 +6,14 @@ import io.gatling.javaapi.http.*;
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
 
-public class WeatherMetricsComponentSimulation extends Simulation {
+public class GetLastDayAverageTemperatureSimulation extends Simulation{
 
     private final HttpProtocolBuilder httpConnection = http
-        .baseUrl("http://localhost:8080/weather-metrics-component")
-        .acceptHeader("application/json")
-        .contentTypeHeader("application/json");
+            .baseUrl("http://localhost:8080/weather-metrics-component")
+            .acceptHeader("application/json")
+            .contentTypeHeader("application/json");
 
-    private static final int USER_COUNT = Integer.parseInt(System.getProperty("USERS", "5"));
+    private static final int USER_COUNT = Integer.parseInt(System.getProperty("USERS", "50"));
     private static final int RAMP_DURATION = Integer.parseInt(System.getProperty("RAMP_DURATION", "10"));
 
     @Override
@@ -22,16 +22,16 @@ public class WeatherMetricsComponentSimulation extends Simulation {
         System.out.printf("Ramping users over %d seconds%n", RAMP_DURATION);
     }
 
-    private static final ChainBuilder getCurrentTemperature = exec(http("GET current temperature").get("/current/temperature"));
+    private static final ChainBuilder getCurrentTemperature = exec(http("GET last day average temperature").get("/last-day/temperature/average"));
 
-    private final ScenarioBuilder scenarioBuilder = scenario("Video Game DB Stress Test")
+    private final ScenarioBuilder scenarioBuilder = scenario("Weather-Metrics-App: Get Last Day Average Temperature Endpoint Stress Test")
             .exec(getCurrentTemperature);
 
     // Load Simulation
     {
         setUp(
                 scenarioBuilder.injectOpen(
-                        //nothingFor(2),
+                        nothingFor(2),
                         rampUsers(USER_COUNT).during(RAMP_DURATION)
                 )
         ).protocols(httpConnection);
